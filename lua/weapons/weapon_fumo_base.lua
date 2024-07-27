@@ -102,9 +102,11 @@ function SWEP:PrimaryAttack()
         ent:Spawn()
 		ent:EmitSound("carryable_fumos/wtfac4.wav", 100, 130)
         ent:EmitSound("carryable_fumos/fumofunkyy.wav", 75, 100)
+		ent:CallOnRemove( "StopEngineSound", function() ent:StopSound( "carryable_fumos/fumofunkyy.wav" ) end )
 		self.FumoCount = self.FumoCount + 2
         timer.Simple(cvarDetonateTime:GetInt(), function()
             if IsValid(ent) then
+				ent:Remove()
                 local explosion = ents.Create("env_explosion")
                 explosion:SetPos(ent:GetPos())
                 explosion:SetOwner(ply)
@@ -130,8 +132,9 @@ function SWEP:PrimaryAttack()
             end
         end)
     end
-
+	if SERVER then
     self:SetNextPrimaryFire(CurTime() + cvarTripCooldown:GetInt())
+	end
 end
 
 function SWEP:SecondaryAttack()
