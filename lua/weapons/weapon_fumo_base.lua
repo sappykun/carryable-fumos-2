@@ -136,7 +136,7 @@ end
 
 function SWEP:SecondaryAttack()
     self.Owner:EmitSound("carryable_fumos/fumosquee.wav", 100, 100)
-    if self:GetNextPrimaryFire() > CurTime() then return end
+    if self:GetNextSecondaryFire() > CurTime() then return end
     self:SetNextSecondaryFire(CurTime() + 1)
 
     if SERVER and self.ClickCount >= cvarMinSqueezes:GetInt() and math.random() < cvarExpChance:GetFloat() then 

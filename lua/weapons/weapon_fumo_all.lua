@@ -11,11 +11,12 @@ SWEP.EquipMenuData = {
 };
 
 SWEP.Kind = 9
-SWEP.PrintName		= "All Fumos"			
+SWEP.PrintName		= "All Fumos"
 SWEP.Purpose        = "fumo!!!!!!!!!!!!"
 SWEP.Instructions   = "left click: dont press that\nright click: change fumo\nreload: squeeze fumo (dont)"
 SWEP.ViewModel = ""
 SWEP.WorldModel = ""
+SWEP.FumoIcon = "entities/weapon_fumo_all.png"
 
 SWEP.OffsetVec = Vector(-5, -2, -5)
 SWEP.OffsetAng = Angle(-50, 50, 80)
@@ -49,6 +50,8 @@ function SWEP:SetupDataTables()
 end
 
 function SWEP:SecondaryAttack()
+	if self.SelectTimer == nil then self.SelectTimer = 0 end
+	if self.SelectTimer > CurTime() then return end
 	fumo = self:GetSelectedFumo() + 1
 	if fumo > #fumo_options then
 		fumo = 1
@@ -62,6 +65,7 @@ function SWEP:SecondaryAttack()
 
 	self:SetSelectedFumo(fumo)
 	self.Owner.LastSelectedFumo = fumo
+	self.SelectTimer = CurTime() + 0.5
 end
 
 
@@ -88,22 +92,26 @@ function SWEP:PreDrawViewModel(vm, weapon, ply)
 end
 
 function SWEP:Reload()
-    self.Owner:EmitSound("carryable_fumos/fumosquee.wav", 100, 100)
-    if self:GetNextPrimaryFire() > CurTime() then return end
-    self:SetNextSecondaryFire(CurTime() + 1)
+	if self.ReloadTimer == nil then self.ReloadTimer = 0 end
+	if self.ReloadTimer > CurTime() then return end
+	
+	self.Owner:EmitSound("carryable_fumos/fumosquee.wav", 100, 100)
+	if self:GetNextPrimaryFire() > CurTime() then return end
+	self:SetNextSecondaryFire(CurTime() + 1)
 
-    if SERVER and self.ClickCount >= cvarMinSqueezes:GetInt() and math.random() < cvarExpChance:GetFloat() then 
-        local explosion = ents.Create("env_explosion") 
-        explosion:SetPos(self.Owner:GetPos()) 
-        explosion:SetOwner(self.Owner)
-        explosion:Spawn()
-        explosion:SetKeyValue("iMagnitude", "200")
-        explosion:Fire("Explode", 0, 0)
+	if SERVER and self.ClickCount >= cvarMinSqueezes:GetInt() and math.random() < cvarExpChance:GetFloat() then 
+		local explosion = ents.Create("env_explosion") 
+		explosion:SetPos(self.Owner:GetPos()) 
+		explosion:SetOwner(self.Owner)
+		explosion:Spawn()
+		explosion:SetKeyValue("iMagnitude", "200")
+		explosion:Fire("Explode", 0, 0)
 
 		if cvarForceKill:GetBool() then
 			self.Owner:Kill()
 		end
-    end
+	end
 	
 	self.ClickCount = self.ClickCount + 1
+	self.ReloadTimer = CurTime() + 1
 end
