@@ -1,19 +1,19 @@
 AddCSLuaFile()
 
 SWEP.Base = "weapon_fumo_base"
-SWEP.Category = "Fumo"
+SWEP.Category = "Fumos"
 SWEP.Spawnable	= true
 
 SWEP.InLoadoutFor = {ROLE_INNOCENT, ROLE_TRAITOR, ROLE_DETECTIVE}
 SWEP.EquipMenuData = {
   type = "fumo!!!!!!!!!!!!",
-  desc = "left click: squeeze fumo\nright click: change fumo"
+  desc = "left click: dont press that\nright click: change fumo\nreload: squeeze fumo (dont)"
 };
 
 SWEP.Kind = 9
-SWEP.PrintName		= "Fumos"			
+SWEP.PrintName		= "All Fumos"			
 SWEP.Purpose        = "fumo!!!!!!!!!!!!"
-SWEP.Instructions   = "left click: squeeze fumo (dont)\nright click: change fumo"
+SWEP.Instructions   = "left click: dont press that\nright click: change fumo\nreload: squeeze fumo (dont)"
 SWEP.ViewModel = ""
 SWEP.WorldModel = ""
 
@@ -36,6 +36,8 @@ local fumo_options = {
 	"weapon_fumo_tsukasa",
 	"weapon_fumo_shion",
 	"weapon_fumo_keiki",
+	"weapon_fumo_junko",
+	"weapon_fumo_momiji",
 }
 
 -- TODO: Save the selected fumo somehow. Could use ClientConVar,
@@ -46,16 +48,16 @@ function SWEP:SetupDataTables()
 	self:SetSelectedFumo(1)
 end
 
-function SWEP:SecondaryAttack()
+function SWEP:Reload()
 	fumo = self:GetSelectedFumo() + 1
 	if fumo > #fumo_options then
 		fumo = 1
 	end
 
 	if CLIENT and IsFirstTimePredicted() then
-		surface.PlaySound("weapons/smg1/switch_single.wav") 
+		surface.PlaySound("carryable_fumos/fumosays.wav") 
 	elseif game.SinglePlayer() then
-		self.Owner:EmitSound("weapons/smg1/switch_single.wav")
+		self.Owner:EmitSound("carryable_fumos/fumosays.wav")
 	end
 
 	self:SetSelectedFumo(fumo)
@@ -83,4 +85,25 @@ end
 
 function SWEP:PreDrawViewModel(vm, weapon, ply)
 	vm:SetModel(self.ViewModel)
+end
+
+function SWEP:SecondaryAttack()
+    self.Owner:EmitSound("carryable_fumos/fumosquee.wav", 100, 100)
+    if self:GetNextPrimaryFire() > CurTime() then return end
+    self:SetNextSecondaryFire(CurTime() + 1)
+
+    if SERVER and self.ClickCount >= cvarMinSqueezes:GetInt() and math.random() < cvarExpChance:GetFloat() then 
+        local explosion = ents.Create("env_explosion") 
+        explosion:SetPos(self.Owner:GetPos()) 
+        explosion:SetOwner(self.Owner)
+        explosion:Spawn()
+        explosion:SetKeyValue("iMagnitude", "200")
+        explosion:Fire("Explode", 0, 0)
+
+		if cvarForceKill:GetBool() then
+			self.Owner:Kill()
+		end
+    end
+	
+	self.ClickCount = self.ClickCount + 1
 end
