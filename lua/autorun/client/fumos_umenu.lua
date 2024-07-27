@@ -7,7 +7,7 @@ local function Fumos_SettingsPanel(Panel)
 end
 
 local function Fumos_PopulateToolMenu()
-	spawnmenu.AddToolMenuOption("Utilities", "Fumos", "Fumos settings", "fumos settings", "", "", Fumos_SettingsPanel)
+	spawnmenu.AddToolMenuOption("Utilities", "Fumos", "Fumos settings", "Fumos settings", "", "", Fumos_SettingsPanel)
 end
 
 hook.Add("PopulateToolMenu", "Fumos_PopulateToolMenu", Fumos_PopulateToolMenu)

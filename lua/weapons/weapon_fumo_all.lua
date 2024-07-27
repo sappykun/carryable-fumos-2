@@ -48,7 +48,7 @@ function SWEP:SetupDataTables()
 	self:SetSelectedFumo(1)
 end
 
-function SWEP:Reload()
+function SWEP:SecondaryAttack()
 	fumo = self:GetSelectedFumo() + 1
 	if fumo > #fumo_options then
 		fumo = 1
@@ -87,7 +87,7 @@ function SWEP:PreDrawViewModel(vm, weapon, ply)
 	vm:SetModel(self.ViewModel)
 end
 
-function SWEP:SecondaryAttack()
+function SWEP:Reload()
     self.Owner:EmitSound("carryable_fumos/fumosquee.wav", 100, 100)
     if self:GetNextPrimaryFire() > CurTime() then return end
     self:SetNextSecondaryFire(CurTime() + 1)
